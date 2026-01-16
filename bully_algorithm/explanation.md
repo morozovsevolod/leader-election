@@ -13,3 +13,4 @@ If a process that was previously down comes back up, it holds an election. If it
 #### *In this implementation:*
 - Following are assumed to be synonyms: process = node, coordinator=leader.
 - id(P)=k assumes P to be an ip address of the node, it takes last number from the ip address. Thus, the limitation is up to 255 processes.
+- Heartbeat is for detection is leader down. Only every 5s, just to keep load small.
