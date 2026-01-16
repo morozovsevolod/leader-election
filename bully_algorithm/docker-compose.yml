@@ -1,0 +1,45 @@
+version: "3.9"
+
+networks:
+  bully-net:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 10.5.0.0/24
+
+services:
+  node1:
+    build: .
+    container_name: node1
+    environment:
+      PROCESS: "10.5.0.2"
+    networks:
+      bully-net:
+        ipv4_address: 10.5.0.2
+
+  node2:
+    build: .
+    container_name: node2
+    environment:
+      PROCESS: "10.5.0.3"
+    networks:
+      bully-net:
+        ipv4_address: 10.5.0.3
+
+  node3:
+    build: .
+    container_name: node3
+    environment:
+      PROCESS: "10.5.0.4"
+    networks:
+      bully-net:
+        ipv4_address: 10.5.0.4
+
+  node4:
+    build: .
+    container_name: node4
+    environment:
+      PROCESS: "10.5.0.5"
+    networks:
+      bully-net:
+        ipv4_address: 10.5.0.5
