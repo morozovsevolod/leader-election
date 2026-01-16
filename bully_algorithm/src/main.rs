@@ -90,12 +90,20 @@ async fn main() -> Result<()> {
 
     sleep(Duration::from_secs(2)).await;
 
-    loop {
+    'outer: loop {
         match election(&higher_nodes, &lower_nodes, &mut receiver).await {
             State::Follower(coordinator) => {
-                heartbeat(coordinator).await;
+                heartbeat(coordinator, &mut receiver).await;
             },
-            State::Leader => { loop {} }
+            State::Leader => {
+                loop {
+                    match receiver.recv().await {
+                        Some(Message::Election) | Some(Message::Coordinator(_)) => { continue 'outer; },
+                        Some(_) => { },
+                        None => panic!("No sender found.")
+                    }
+                }
+            }
         }
     }
 }
@@ -197,12 +205,19 @@ async fn election(higher_nodes: &Vec<(String, u32)>, lower_nodes: &Vec<(String, 
     }
 }
 
-async fn heartbeat(coordinator: String) -> () {
+async fn heartbeat(coordinator: String, receiver: &mut Receiver<Message>) -> () {
     let addr = format!("{coordinator}:5555");
     let mut buf = [0; 256];
     info!("{addr} is leader!");
     loop {
         sleep(Duration::from_secs(5)).await;
+        match receiver.try_recv() {
+            Ok(Message::Election) | Ok(Message::Coordinator(_)) => { return; },
+            Ok(_) => { },
+            Err(mpsc::error::TryRecvError::Empty) => {},
+            Err(_) => panic!("No sender found.")
+        }
+
         if let Ok(mut stream) = TcpStream::connect(&addr).await {
             let _ = stream.write(b"HEARTBEAT").await;
             let _ = stream.read(&mut buf[..]).await;
