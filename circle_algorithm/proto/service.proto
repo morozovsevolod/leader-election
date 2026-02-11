@@ -5,11 +5,11 @@ package circle_node_service;
 import "google/protobuf/empty.proto";
 
 message ElectionRequest {
-    repeated string nodes = 1;
+    repeated int32 nodes = 1;
 }
 
 message CoordinatorRequest {
-    repeated string nodes = 1;
+    repeated int32 nodes = 1;
 }
 
 message CircleNodeResponse {
