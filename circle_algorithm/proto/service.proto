@@ -1,0 +1,23 @@
+syntax = "proto3";
+
+package circle_node_service;
+
+import "google/protobuf/empty.proto";
+
+message ElectionRequest {
+    repeated string nodes = 1;
+}
+
+message CoordinatorRequest {
+    repeated string nodes = 1;
+}
+
+message CircleNodeResponse {
+    bool success = 1;
+}
+
+service CircleNode {
+    rpc Election(ElectionRequest) returns (CircleNodeResponse);
+    rpc Coordinator(CoordinatorRequest) returns (CircleNodeResponse);
+    rpc Heartbeat(google.protobuf.Empty) returns (CircleNodeResponse);
+}
